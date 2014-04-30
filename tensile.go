@@ -134,6 +134,9 @@ func checkMaxErr(quit chan bool) bool {
 // Consumer
 func consumer(respChan chan response, quit chan bool) (int64, int64) {
 	defer close(quit)
+	defer func() {
+		log.Printf(ErrTotalError, numErr)
+	}()
 	var (
 		conns      int64
 		size       int64
@@ -145,7 +148,6 @@ func consumer(respChan chan response, quit chan bool) (int64, int64) {
 		case r.err != nil:
 			log.Println(r.err)
 			if checkMaxErr(quit) {
-				log.Printf(ErrTotalError, numErr)
 				return conns, size
 			}
 		case r.StatusCode >= 400:
@@ -154,7 +156,6 @@ func consumer(respChan chan response, quit chan bool) (int64, int64) {
 			}
 			prevStatus = r.StatusCode
 			if checkMaxErr(quit) {
-				log.Printf(ErrTotalError, numErr)
 				return conns, size
 			}
 		default:
@@ -162,7 +163,6 @@ func consumer(respChan chan response, quit chan bool) (int64, int64) {
 			conns++
 		}
 	}
-	log.Printf(ErrTotalError, numErr)
 	return conns, size
 }
 
