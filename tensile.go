@@ -83,13 +83,8 @@ func workerPool(reqChan chan *http.Request, respChan chan Response, quit chan bo
 	t := &http.Transport{}
 	defer t.CloseIdleConnections()
 	for runningWorkers = 0; runningWorkers < max; runningWorkers++ {
-		select {
-		case <-quit:
-			return
-		default:
-			wg.Add(1)
-			go worker(t, reqChan, respChan, quit)
-		}
+		wg.Add(1)
+		go worker(t, reqChan, respChan, quit)
 	}
 }
 
