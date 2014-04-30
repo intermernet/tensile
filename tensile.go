@@ -33,6 +33,7 @@ var (
 	maxErrError     string = "ERROR: -maxerror (-e) must be greater than 0\n"
 	urlError        string = "ERROR: -url (-u) cannot be blank\n"
 	schemeError     string = "ERROR: unsupported protocol scheme %s\n"
+	ErrLimError     string = "ERROR: Maximum error limit reached:\t%d\n\n"
 	cpuWarn         string = "NOTICE: -cpu=%d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
 	maxGTreqsWarn   string = "NOTICE: -concurrent=%d is greater than -requests\n\tChanging -concurrent to %d\n\n"
 
@@ -111,6 +112,17 @@ func killWorkers(quit chan bool) {
 	}
 }
 
+//Check maximum error count
+func checkMaxErr(quit chan bool) bool {
+	numErr++
+	if numErr >= maxErr {
+		killWorkers(quit)
+		log.Printf(ErrLimError, numErr)
+		return true
+	}
+	return false
+}
+
 // Consumer
 func consumer(respChan chan Response, quit chan bool) (int64, int64) {
 	defer close(quit)
@@ -123,10 +135,7 @@ func consumer(respChan chan Response, quit chan bool) (int64, int64) {
 		switch {
 		case r.err != nil:
 			log.Println(r.err)
-			numErr++
-			if numErr >= maxErr {
-				killWorkers(quit)
-				log.Printf("Number of Errors:\t%d\n\n", numErr)
+			if checkMaxErr(quit) {
 				return conns, size
 			}
 		case r.StatusCode >= 400:
@@ -134,10 +143,7 @@ func consumer(respChan chan Response, quit chan bool) (int64, int64) {
 				log.Printf("ERROR: %s\n", r.Status)
 			}
 			prevStatus = r.StatusCode
-			numErr++
-			if numErr >= maxErr {
-				killWorkers(quit)
-				log.Printf("Number of Errors:\t%d\n\n", numErr)
+			if checkMaxErr(quit) {
 				return conns, size
 			}
 		default:
