@@ -25,7 +25,7 @@ const (
 )
 
 var (
-	reqs, max, numCPU, maxCPU, numErr, maxErr, runningWorkers int
+	reqs, max, numCPU, maxCPU, numErr, maxErr int
 
 	urlStr, flagErr string
 	reqsError       string = "ERROR: -reqs (-r) must be greater than 0\n"
@@ -75,7 +75,7 @@ func workerPool(reqChan chan *http.Request, respChan chan Response, quit chan bo
 	defer wg.Wait()
 	t := &http.Transport{}
 	defer t.CloseIdleConnections()
-	for runningWorkers = 0; runningWorkers < max; runningWorkers++ {
+	for i := 0; i < max; i++ {
 		wg.Add(1)
 		go worker(t, reqChan, respChan, quit)
 	}
@@ -102,8 +102,13 @@ func worker(t *http.Transport, reqChan chan *http.Request, respChan chan Respons
 
 // Kill Workers
 func killWorkers(quit chan bool) {
-	for i := 0; i < runningWorkers; i++ {
-		quit <- true
+	for {
+		select {
+		case quit <- true:
+		default:
+			return
+		}
+
 	}
 }
 
