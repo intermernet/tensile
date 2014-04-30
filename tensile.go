@@ -90,8 +90,7 @@ func worker(t *http.Transport, reqChan chan *http.Request, respChan chan respons
 		case req, ok := <-reqChan:
 			if ok {
 				resp, err := t.RoundTrip(req)
-				r := response{resp, err}
-				respChan <- r
+				respChan <- response{resp, err}
 			} else {
 				return
 			}
