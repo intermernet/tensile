@@ -97,13 +97,20 @@ func worker(t *http.Transport, reqChan chan *http.Request, respChan chan Respons
 // Consumer
 func consumer(respChan chan Response) (int64, int64) {
 	var (
-		conns int64
-		size  int64
+		conns      int64
+		size       int64
+		prevStatus int
 	)
 	for r := range respChan {
-		if r.err != nil {
+		switch {
+		case r.err != nil:
 			log.Println(r.err)
-		} else {
+		case r.StatusCode >= 400:
+			if r.StatusCode != prevStatus {
+				log.Printf("ERROR: %s\n", r.Status)
+			}
+			prevStatus = r.StatusCode
+		default:
 			size += r.ContentLength
 			if err := r.Body.Close(); err != nil {
 				log.Println(r.err)
