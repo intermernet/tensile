@@ -140,7 +140,7 @@ func main() {
 		max = reqs
 	}
 	// Start
-	runtime.GOMAXPROCS(runtime.NumCPU())
+	runtime.GOMAXPROCS(numCPU)
 	reqChan := make(chan *http.Request)
 	respChan := make(chan Response)
 	fmt.Printf("Sending %d requests to %s with %d concurrent workers.\n\n", reqs, urlStr, max)
