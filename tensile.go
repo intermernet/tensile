@@ -35,7 +35,7 @@ var (
 	urlStr string
 
 	flagErr     string
-	reqsError   string = "ERROR: -requests must be greater than 0\n"
+	reqsError   string = "ERROR: -reqs must be greater than 0\n"
 	maxError    string = "ERROR: -concurrent must be greater than 0\n"
 	maxErrError string = "ERROR: -errorlimit must be greater than 0\n"
 	urlError    string = "ERROR: -url cannot be blank\n"
