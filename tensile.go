@@ -155,7 +155,6 @@ func consumer(respChan chan Response, quit chan bool) (int64, int64) {
 }
 
 func main() {
-	// Flag checks
 	flag.Parse()
 	fmt.Printf(app, version)
 	// Flag Errors
