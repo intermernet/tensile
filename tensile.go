@@ -97,7 +97,7 @@ func consumer(respChan chan Response) (int64, int64) {
 func main() {
 	flag.Parse()
 	fmt.Printf("\n\tTensile web stress test tool v%s\n\n", version)
-	if reqs < max {
+	if max > reqs {
 		fmt.Println("NOTICE: Concurrent requests is greater than number of requests.")
 		fmt.Println("\tChanging concurrent requests to number of requests\n")
 		max = reqs
