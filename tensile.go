@@ -113,8 +113,8 @@ func worker(t *http.Transport, reqChan chan *http.Request, respChan chan Respons
 }
 
 // Kill Workers
-func killWorkers(n int, quit chan bool) {
-	for i := 0; i < n; i++ {
+func killWorkers(quit chan bool) {
+	for i := 0; i < runningWorkers; i++ {
 		quit <- true
 	}
 }
@@ -133,7 +133,7 @@ func consumer(respChan chan Response, quit chan bool) (int64, int64) {
 			log.Println(r.err)
 			numErr++
 			if numErr >= maxErr {
-				killWorkers(runningWorkers, quit)
+				killWorkers(quit)
 				log.Printf("Number of Errors:\t%d\n\n", numErr)
 				return conns, size
 			}
@@ -144,7 +144,7 @@ func consumer(respChan chan Response, quit chan bool) (int64, int64) {
 			prevStatus = r.StatusCode
 			numErr++
 			if numErr >= maxErr {
-				killWorkers(runningWorkers, quit)
+				killWorkers(quit)
 				log.Printf("Number of Errors:\t%d\n\n", numErr)
 				return conns, size
 			}
