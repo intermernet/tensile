@@ -47,7 +47,7 @@ var (
 func init() {
 	flag.StringVar(&urlStr, "url", "http://localhost/", "Target URL")
 	flag.StringVar(&urlStr, "u", "http://localhost/", "Target URL (short flag)")
-	flag.IntVar(&reqs, "request", 50, "Total requests")
+	flag.IntVar(&reqs, "requests", 50, "Total requests")
 	flag.IntVar(&reqs, "r", 50, "Total requests (short flag)")
 	flag.IntVar(&max, "concurrent", 5, "Maximum concurrent requests")
 	flag.IntVar(&max, "c", 5, "Maximum concurrent requests (short flag")

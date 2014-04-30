@@ -11,13 +11,13 @@ Example usage:
       -concurrent=5: Maximum concurrent requests
       -cpu=4: Number of CPUs
       -r=50: Total requests (short flag)
-      -request=50: Total requests
+      -requests=50: Total requests
       -u="http://localhost/": Target URL (short flag)
       -url="http://localhost/": Target URL
     
 
     
-    $ tensile -concurrent=200 -reqs=1000 -cpu=2
+    $ tensile -concurrent=200 -requests=1000 -cpu=2
 
             Tensile web stress test tool v0.1
     
