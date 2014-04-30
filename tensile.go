@@ -29,10 +29,10 @@ var (
 
 	wg sync.WaitGroup
 
-	reqsError   = "ERROR: -reqs must be greater than 0\n"
-	maxError    = "ERROR: -concurrent must be greater than 0\n"
-	urlError    = "ERROR: Invalid URL\n"
-	schemeError = "ERROR: unsupported protocol scheme %s\n"
+	reqsError   string = "ERROR: -reqs must be greater than 0\n"
+	maxError    string = "ERROR: -concurrent must be greater than 0\n"
+	urlError    string = "ERROR: URL cannot be blank\n"
+	schemeError string = "ERROR: unsupported protocol scheme %s\n"
 )
 
 func init() {
@@ -111,19 +111,18 @@ func main() {
 	if max <= 0 {
 		flagErr += maxError
 	}
-	if flagErr != "" {
-		log.Fatal(fmt.Errorf("%s", flagErr))
-	}
 	if urlStr == "" {
-		log.Fatal(fmt.Errorf("%s", urlError))
+		flagErr += urlError
 	}
 	u, err := url.Parse(urlStr)
 	if err != nil {
-		log.Print(urlError)
-		log.Fatal(fmt.Errorf("%s", err))
+		flagErr += err.Error()
 	}
 	if u.Scheme != "http" && u.Scheme != "https" {
-		log.Fatal(fmt.Errorf(schemeError, u.Scheme))
+		flagErr += fmt.Sprintf(schemeError, u.Scheme)
+	}
+	if flagErr != "" {
+		log.Fatal(fmt.Errorf("\n%s", flagErr))
 	}
 	if max > reqs {
 		fmt.Println("NOTICE: Concurrent requests is greater than number of requests.")
