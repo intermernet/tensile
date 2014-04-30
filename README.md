@@ -5,6 +5,13 @@ Tensile Web Stress Test Tool
 
 Example usage:
 
+    tensile -help
+    Usage of tensile:
+      -concurrent=100: Maximum concurrent requests
+      -reqs=1000: Total requests
+      -url="http://localhost/": Target URL
+    
+    
     tensile.exe -concurrent=200 -reqs=1000
     
     Sending 1000 requests to http://localhost/ with 200 concurrent workers.
