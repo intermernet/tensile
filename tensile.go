@@ -134,11 +134,6 @@ func checkMaxErr(quit chan bool) bool {
 // Consumer
 func consumer(respChan chan response, quit chan bool) (int64, int64) {
 	defer close(quit)
-	defer func() {
-		if numErr > 0 {
-			log.Printf(ErrTotalError, numErr)
-		}
-	}()
 	var (
 		conns, size int64
 		prevStatus  int
@@ -213,6 +208,9 @@ func main() {
 	go workerPool(reqChan, respChan, quit)
 	fmt.Println("Waiting for replies...\n")
 	conns, size := consumer(respChan, quit)
+	if numErr > 0 {
+		log.Printf(ErrTotalError, numErr)
+	}
 	// Calculate stats
 	took := time.Since(start)
 	tookNS := took.Nanoseconds()
