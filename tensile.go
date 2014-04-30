@@ -35,16 +35,19 @@ var (
 	urlError    string = "ERROR: URL cannot be blank\n"
 	schemeError string = "ERROR: unsupported protocol scheme %s\n"
 
-	cpuWarn       string = "NOTICE: -cpu %d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
-	maxGTreqsWarn string = "NOTICE: -concurrent is greater than -reqs\n\tChanging -concurrent to -reqs\n\n"
+	cpuWarn       string = "NOTICE: -cpu=%d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
+	maxGTreqsWarn string = "NOTICE: -concurrent=%d is greater than -reqs\n\tChanging -concurrent to %d\n\n"
 
 	wg sync.WaitGroup
 )
 
 func init() {
 	flag.StringVar(&urlStr, "url", "http://localhost/", "Target URL")
-	flag.IntVar(&reqs, "reqs", 50, "Total requests")
+	flag.StringVar(&urlStr, "u", "http://localhost/", "Target URL (short flag)")
+	flag.IntVar(&reqs, "request", 50, "Total requests")
+	flag.IntVar(&reqs, "r", 50, "Total requests (short flag)")
 	flag.IntVar(&max, "concurrent", 5, "Maximum concurrent requests")
+	flag.IntVar(&max, "c", 5, "Maximum concurrent requests (short flag")
 	maxCPU = runtime.NumCPU()
 	flag.IntVar(&numCPU, "cpu", maxCPU, "Number of CPUs")
 }
@@ -136,7 +139,7 @@ func main() {
 		numCPU = maxCPU
 	}
 	if max > reqs {
-		fmt.Println(maxGTreqsWarn)
+		fmt.Printf(maxGTreqsWarn, max, reqs)
 		max = reqs
 	}
 	// Start

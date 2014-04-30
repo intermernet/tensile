@@ -5,20 +5,23 @@ Tensile Web Stress Test Tool
 
 Example usage:
 
-    tensile -help
+    $ tensile -help
     Usage of tensile:
+      -c=5: Maximum concurrent requests (short flag
       -concurrent=5: Maximum concurrent requests
       -cpu=4: Number of CPUs
-      -reqs=50: Total requests
+      -r=50: Total requests (short flag)
+      -request=50: Total requests
+      -u="http://localhost/": Target URL (short flag)
       -url="http://localhost/": Target URL
     
 
     
-    tensile -concurrent=200 -reqs=1000
+    $ tensile -concurrent=200 -reqs=1000 -cpu=2
 
             Tensile web stress test tool v0.1
     
-    Sending 1000 requests to http://localhost/ with 200 concurrent workers.
+    Sending 1000 requests to http://localhost/ with 200 concurrent workers using 2 CPUs.
     Waiting for replies...
     
     Connections:    1000
@@ -29,14 +32,14 @@ Example usage:
 
 
 
-    tensile -concurrent=200 -reqs=100
+    $ tensile -c=200 -r=100
 
             Tensile web stress test tool v0.1
 
-    NOTICE: Concurrent requests is greater than number of requests.
-            Changing concurrent requests to number of requests
+    NOTICE: -concurrent=200 is greater than -reqs
+            Changing -concurrent to 100
     
-    Sending 100 requests to http://localhost/ with 100 concurrent workers.
+    Sending 100 requests to http://localhost/ with 100 concurrent workers using 4 CPUs.
     Waiting for replies...
     
     Connections:    100
