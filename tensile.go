@@ -22,23 +22,23 @@ import (
 const version = "0.1"
 
 var (
-	urlStr string
-
-	reqs int
-	max  int
-
-	wg     sync.WaitGroup
+	reqs   int
+	max    int
 	numCPU int
 	maxCPU int
 
+	urlStr string
+
+	flagErr     string
 	reqsError   string = "ERROR: -reqs must be greater than 0\n"
 	maxError    string = "ERROR: -concurrent must be greater than 0\n"
 	urlError    string = "ERROR: URL cannot be blank\n"
 	schemeError string = "ERROR: unsupported protocol scheme %s\n"
-	flagErr     string
 
 	cpuWarn       string = "NOTICE: -cpu %d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
 	maxGTreqsWarn string = "NOTICE: -concurrent is greater than -reqs\n\tChanging -concurrent to -reqs\n\n"
+
+	wg sync.WaitGroup
 )
 
 func init() {
