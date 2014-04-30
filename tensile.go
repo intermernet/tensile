@@ -28,7 +28,7 @@ var (
 	reqs, max, numCPU, maxCPU, numErr, maxErr int
 
 	urlStr, flagErr string
-	reqsError       string = "ERROR: -reqs (-r) must be greater than 0\n"
+	reqsError       string = "ERROR: -requests (-r) must be greater than 0\n"
 	maxError        string = "ERROR: -concurrent (-c) must be greater than 0\n"
 	maxErrError     string = "ERROR: -maxerror (-e) must be greater than 0\n"
 	urlError        string = "ERROR: -url (-u) cannot be blank\n"
