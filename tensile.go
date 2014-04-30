@@ -143,7 +143,7 @@ func main() {
 	runtime.GOMAXPROCS(numCPU)
 	reqChan := make(chan *http.Request)
 	respChan := make(chan Response)
-	fmt.Printf("Sending %d requests to %s with %d concurrent workers.\n\n", reqs, urlStr, max)
+	fmt.Printf("Sending %d requests to %s with %d concurrent workers using %d CPUs.\n\n", reqs, urlStr, max, numCPU)
 	start := time.Now()
 	go dispatcher(reqChan)
 	go workerPool(reqChan, respChan)
