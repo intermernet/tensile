@@ -157,12 +157,12 @@ func main() {
 	conns, size := consumer(respChan)
 	// Calculate stats
 	took := time.Since(start)
-	ns := took.Nanoseconds()
-	var av int64
+	tookNS := took.Nanoseconds()
+	var averageNS int64
 	if conns != 0 {
-		av = ns / conns
+		averageNS = tookNS / conns
 	}
-	average, err := time.ParseDuration(fmt.Sprintf("%d", av) + "ns")
+	average, err := time.ParseDuration(fmt.Sprintf("%d", averageNS) + "ns")
 	if err != nil {
 		log.Println(err)
 	}
