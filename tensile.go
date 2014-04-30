@@ -50,7 +50,7 @@ func init() {
 	flag.IntVar(&reqs, "requests", 50, "Total requests")
 	flag.IntVar(&reqs, "r", 50, "Total requests (short flag)")
 	flag.IntVar(&max, "concurrent", 5, "Maximum concurrent requests")
-	flag.IntVar(&max, "c", 5, "Maximum concurrent requests (short flag")
+	flag.IntVar(&max, "c", 5, "Maximum concurrent requests (short flag)")
 	maxCPU = runtime.NumCPU()
 	flag.IntVar(&numCPU, "cpu", maxCPU, "Number of CPUs")
 }
