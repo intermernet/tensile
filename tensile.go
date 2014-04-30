@@ -33,7 +33,7 @@ var (
 	maxErrError     string = "ERROR: -maxerror (-e) must be greater than 0\n"
 	urlError        string = "ERROR: -url (-u) cannot be blank\n"
 	schemeError     string = "ERROR: unsupported protocol scheme %s\n"
-	ErrLimError     string = "ERROR: Maximum error limit reached:\t%d\n\n"
+	ErrLimError     string = "ERROR: maximum error limit reached:\t%d\n\n"
 	cpuWarn         string = "NOTICE: -cpu=%d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
 	maxGTreqsWarn   string = "NOTICE: -concurrent=%d is greater than -requests\n\tChanging -concurrent to %d\n\n"
 
