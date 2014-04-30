@@ -58,6 +58,13 @@ type response struct {
 	err error
 }
 
+// Close response Body
+func (r *response) closeBody() {
+	if err := r.Body.Close(); err != nil {
+		log.Println(r.err)
+	}
+}
+
 // Dispatcher
 func dispatcher(reqChan chan *http.Request) {
 	defer close(reqChan)
@@ -122,13 +129,6 @@ func checkMaxErr(quit chan bool) bool {
 	return false
 }
 
-// Close response Body
-func closeResponseBody(r *response) {
-	if err := r.Body.Close(); err != nil {
-		log.Println(r.err)
-	}
-}
-
 // Consumer
 func consumer(respChan chan response, quit chan bool) (int64, int64) {
 	defer close(quit)
@@ -138,7 +138,7 @@ func consumer(respChan chan response, quit chan bool) (int64, int64) {
 		prevStatus int
 	)
 	for r := range respChan {
-		defer closeResponseBody(&r)
+		defer r.closeBody()
 		switch {
 		case r.err != nil:
 			log.Println(r.err)
