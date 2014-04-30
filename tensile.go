@@ -39,7 +39,7 @@ var (
 	schemeError string = "ERROR: unsupported protocol scheme %s\n"
 
 	cpuWarn       string = "NOTICE: -cpu=%d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
-	maxGTreqsWarn string = "NOTICE: -concurrent=%d is greater than -reqs\n\tChanging -concurrent to %d\n\n"
+	maxGTreqsWarn string = "NOTICE: -concurrent=%d is greater than -requests\n\tChanging -concurrent to %d\n\n"
 
 	wg sync.WaitGroup
 )
