@@ -19,7 +19,10 @@ import (
 	"time"
 )
 
-const version = "0.1"
+const (
+	app     = "\n\tTensile web stress test tool v%s\n\n"
+	version = "0.1"
+)
 
 var (
 	reqs   int
@@ -114,7 +117,7 @@ func consumer(respChan chan Response) (int64, int64) {
 func main() {
 	// Flag checks
 	flag.Parse()
-	fmt.Printf("\n\tTensile web stress test tool v%s\n\n", version)
+	fmt.Printf(app, version)
 	if reqs <= 0 {
 		flagErr += reqsError
 	}
