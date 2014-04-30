@@ -12,7 +12,7 @@ Example usage:
       -url="http://localhost/": Target URL
     
     
-    tensile.exe -concurrent=200 -reqs=1000
+    tensile -concurrent=200 -reqs=1000
     
     Sending 1000 requests to http://localhost/ with 200 concurrent workers.
     Waiting for replies...
@@ -24,7 +24,7 @@ Example usage:
     Average time:   1.990368ms
 
 
-    tensile.exe -concurrent=200 -reqs=100
+    tensile -concurrent=200 -reqs=100
     NOTICE: Concurrent requests is greater than number of requests.
             Changing concurrent requests to number of requests
     
