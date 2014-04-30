@@ -7,7 +7,7 @@ Example usage:
 
     $ tensile -help
     Usage of tensile:
-      -c=5: Maximum concurrent requests (short flag
+      -c=5: Maximum concurrent requests (short flag)
       -concurrent=5: Maximum concurrent requests
       -cpu=4: Number of CPUs
       -r=50: Total requests (short flag)
