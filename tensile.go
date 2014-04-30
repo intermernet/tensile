@@ -108,7 +108,6 @@ func killWorkers(quit chan bool) {
 		default:
 			return
 		}
-
 	}
 }
 
