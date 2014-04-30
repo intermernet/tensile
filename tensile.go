@@ -25,23 +25,16 @@ const (
 )
 
 var (
-	reqs           int
-	max            int
-	numCPU         int
-	maxCPU         int
-	numErr         int
-	maxErr         int
-	runningWorkers int
+	reqs, max, numCPU, maxCPU, numErr, maxErr, runningWorkers int
 
-	urlStr        string
-	flagErr       string
-	reqsError     string = "ERROR: -reqs (-r) must be greater than 0\n"
-	maxError      string = "ERROR: -concurrent (-c) must be greater than 0\n"
-	maxErrError   string = "ERROR: -maxerror (-e) must be greater than 0\n"
-	urlError      string = "ERROR: -url (-u) cannot be blank\n"
-	schemeError   string = "ERROR: unsupported protocol scheme %s\n"
-	cpuWarn       string = "NOTICE: -cpu=%d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
-	maxGTreqsWarn string = "NOTICE: -concurrent=%d is greater than -requests\n\tChanging -concurrent to %d\n\n"
+	urlStr, flagErr string
+	reqsError       string = "ERROR: -reqs (-r) must be greater than 0\n"
+	maxError        string = "ERROR: -concurrent (-c) must be greater than 0\n"
+	maxErrError     string = "ERROR: -maxerror (-e) must be greater than 0\n"
+	urlError        string = "ERROR: -url (-u) cannot be blank\n"
+	schemeError     string = "ERROR: unsupported protocol scheme %s\n"
+	cpuWarn         string = "NOTICE: -cpu=%d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
+	maxGTreqsWarn   string = "NOTICE: -concurrent=%d is greater than -requests\n\tChanging -concurrent to %d\n\n"
 
 	wg sync.WaitGroup
 )
