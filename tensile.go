@@ -32,8 +32,8 @@ var (
 
 func init() {
 	flag.StringVar(&url, "url", "http://localhost/", "Target URL")
-	flag.IntVar(&reqs, "reqs", 1000, "Total requests")
-	flag.IntVar(&max, "concurrent", 100, "Maximum concurrent requests")
+	flag.IntVar(&reqs, "reqs", 50, "Total requests")
+	flag.IntVar(&max, "concurrent", 5, "Maximum concurrent requests")
 }
 
 type Response struct {

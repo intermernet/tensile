@@ -7,8 +7,8 @@ Example usage:
 
     tensile -help
     Usage of tensile:
-      -concurrent=100: Maximum concurrent requests
-      -reqs=1000: Total requests
+      -concurrent=5: Maximum concurrent requests
+      -reqs=50: Total requests
       -url="http://localhost/": Target URL
     
     
