@@ -10,6 +10,8 @@ Example usage:
       -c=5: Maximum concurrent requests (short flag)
       -concurrent=5: Maximum concurrent requests
       -cpu=4: Number of CPUs
+      -e=1: Maximum errors before exiting (short flag
+      -maxerror=1: Maximum errors before exiting
       -r=50: Total requests (short flag)
       -requests=50: Total requests
       -u="http://localhost/": Target URL (short flag)
