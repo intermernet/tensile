@@ -140,9 +140,8 @@ func consumer(respChan chan response, quit chan bool) (int64, int64) {
 		}
 	}()
 	var (
-		conns      int64
-		size       int64
-		prevStatus int
+		conns, size int64
+		prevStatus  int
 	)
 	for r := range respChan {
 		defer r.closeBody()
