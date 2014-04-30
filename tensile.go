@@ -36,6 +36,7 @@ var (
 	urlError    string = "ERROR: URL cannot be blank\n"
 	schemeError string = "ERROR: unsupported protocol scheme %s\n"
 	cpuError    string = "ERROR: -cpu cannot exceed %d on this system\n"
+	flagErr     string
 )
 
 func init() {
@@ -109,7 +110,6 @@ func main() {
 	// Flag checks
 	flag.Parse()
 	fmt.Printf("\n\tTensile web stress test tool v%s\n\n", version)
-	flagErr := ""
 	if reqs <= 0 {
 		flagErr += reqsError
 	}
