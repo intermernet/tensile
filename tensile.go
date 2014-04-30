@@ -30,7 +30,7 @@ var (
 	urlStr, flagErr string
 	reqsError       string = "ERROR: -requests (-r) must be greater than 0\n"
 	maxError        string = "ERROR: -concurrent (-c) must be greater than 0\n"
-	maxErrError     string = "ERROR: -maxerror (-e) must be greater than 0\n"
+	maxErrError     string = "ERROR: -maxerror (-e) must be greater than 0, or -1 for unlimited\n"
 	urlError        string = "ERROR: -url (-u) cannot be blank\n"
 	schemeError     string = "ERROR: unsupported protocol scheme %s\n"
 	ErrLimError     string = "ERROR: maximum error limit reached:\t%d\n\n"
@@ -120,8 +120,11 @@ func killWorkers(quit chan bool) {
 
 // Check maximum error count
 func checkMaxErr(quit chan bool) bool {
+	if maxErr == -1 {
+		return false
+	}
 	numErr++
-	if numErr >= maxErr {
+	if numErr >= maxErr && maxErr != -1 {
 		killWorkers(quit)
 		log.Printf(ErrLimError, numErr)
 		return true
@@ -170,6 +173,9 @@ func main() {
 	}
 	if max <= 0 {
 		flagErr += maxError
+	}
+	if maxErr == 0 || maxErr < -1 {
+		flagErr += maxErrError
 	}
 	if urlStr == "" {
 		flagErr += urlError
