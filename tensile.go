@@ -135,8 +135,11 @@ func checkMaxErr(quit chan bool) bool {
 func consumer(respChan chan response, quit chan bool) (int64, int64) {
 	defer close(quit)
 	defer func() {
-		log.Printf(ErrTotalError, numErr)
+		if numErr > 0 {
+			log.Printf(ErrTotalError, numErr)
+		}
 	}()
+
 	var (
 		conns      int64
 		size       int64
