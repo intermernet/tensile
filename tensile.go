@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"runtime"
 	"sync"
 	"time"
@@ -97,6 +98,17 @@ func consumer(respChan chan Response) (int64, int64) {
 func main() {
 	flag.Parse()
 	fmt.Printf("\n\tTensile web stress test tool v%s\n\n", version)
+	flagErr := ""
+	if reqs <= 0 {
+		flagErr += "ERROR: -reqs must be greater than 0\n"
+	}
+	if max <= 0 {
+		flagErr += "ERROR: -concurrent must be greater than 0\n"
+	}
+	if flagErr != "" {
+		fmt.Printf("%s\n", flagErr)
+		os.Exit(0)
+	}
 	if max > reqs {
 		fmt.Println("NOTICE: Concurrent requests is greater than number of requests.")
 		fmt.Println("\tChanging concurrent requests to number of requests\n")
