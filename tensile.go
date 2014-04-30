@@ -25,16 +25,19 @@ const (
 )
 
 var (
-	reqs   int
-	max    int
-	numCPU int
-	maxCPU int
+	reqs     int
+	max      int
+	numCPU   int
+	maxCPU   int
+	maxErr   int
+	errCount int
 
 	urlStr string
 
 	flagErr     string
 	reqsError   string = "ERROR: -requests must be greater than 0\n"
 	maxError    string = "ERROR: -concurrent must be greater than 0\n"
+	maxErrError string = "ERROR: -errorlimit must be greater than 0\n"
 	urlError    string = "ERROR: -url cannot be blank\n"
 	schemeError string = "ERROR: unsupported protocol scheme %s\n"
 
@@ -51,13 +54,20 @@ func init() {
 	flag.IntVar(&reqs, "r", 50, "Total requests (short flag)")
 	flag.IntVar(&max, "concurrent", 5, "Maximum concurrent requests")
 	flag.IntVar(&max, "c", 5, "Maximum concurrent requests (short flag)")
+	flag.IntVar(&maxErr, "errorlimit", 1, "Maximum errors")
+	flag.IntVar(&maxErr, "e", 1, "Maximum errors (short flag)")
 	maxCPU = runtime.NumCPU()
 	flag.IntVar(&numCPU, "cpu", maxCPU, "Number of CPUs")
 }
 
-type Response struct {
+type response struct {
 	*http.Response
 	err error
+}
+
+func processing(waitChan chan bool) {
+	wg.Wait()
+	waitChan <- true
 }
 
 // Dispatcher
@@ -73,41 +83,67 @@ func dispatcher(reqChan chan *http.Request) {
 }
 
 // Worker Pool
-func workerPool(reqChan chan *http.Request, respChan chan Response) {
+func workerPool(reqChan chan *http.Request, respChan chan response, quit chan bool) {
 	defer close(respChan)
 	t := &http.Transport{}
 	defer t.CloseIdleConnections()
 	for i := 0; i < max; i++ {
 		wg.Add(1)
-		go worker(t, reqChan, respChan)
+		go worker(t, reqChan, respChan, quit)
 	}
-	wg.Wait()
+	waitChan := make(chan bool)
+	go processing(waitChan)
+	for {
+		select {
+		case <-waitChan:
+			return
+		case <-quit:
+			return
+		}
+	}
 }
 
 // Worker
-func worker(t *http.Transport, reqChan chan *http.Request, respChan chan Response) {
+func worker(t *http.Transport, reqChan chan *http.Request, respChan chan response, quit chan bool) {
 	defer wg.Done()
 	for req := range reqChan {
-		resp, err := t.RoundTrip(req)
-		r := Response{resp, err}
-		respChan <- r
+		select {
+		case <-quit:
+			return
+		default:
+			resp, err := t.RoundTrip(req)
+			r := response{resp, err}
+			respChan <- r
+		}
 	}
 }
 
 // Consumer
-func consumer(respChan chan Response) (int64, int64) {
+func consumer(respChan chan response, quit chan bool) (int64, int64) {
+	defer close(quit)
 	var (
 		conns int64
 		size  int64
 	)
 	for r := range respChan {
-		if r.err != nil {
-			log.Println(r.err)
+		if r.err != nil || r.StatusCode >= 400 {
+			if r.err != nil {
+				log.Println(r.err)
+			} else {
+				log.Println(r.Status)
+			}
+			errCount++
 		} else {
 			size += r.ContentLength
-			if err := r.Body.Close(); err != nil {
-				log.Println(r.err)
+		}
+		if err := r.Body.Close(); err != nil {
+			log.Println(r.err)
+		}
+		if errCount >= maxErr {
+			for i := 0; i <= max; i++ {
+				quit <- true
 			}
+			return conns, size
 		}
 		conns++
 	}
@@ -123,6 +159,9 @@ func main() {
 	}
 	if max <= 0 {
 		flagErr += maxError
+	}
+	if maxErr <= 0 {
+		flagErr += maxErrError
 	}
 	if urlStr == "" {
 		flagErr += urlError
@@ -148,13 +187,14 @@ func main() {
 	// Start
 	runtime.GOMAXPROCS(numCPU)
 	reqChan := make(chan *http.Request)
-	respChan := make(chan Response)
+	respChan := make(chan response)
+	quit := make(chan bool)
 	fmt.Printf("Sending %d requests to %s with %d concurrent workers using %d CPUs.\n\n", reqs, urlStr, max, numCPU)
 	start := time.Now()
 	go dispatcher(reqChan)
-	go workerPool(reqChan, respChan)
+	go workerPool(reqChan, respChan, quit)
 	fmt.Println("Waiting for replies...\n")
-	conns, size := consumer(respChan)
+	conns, size := consumer(respChan, quit)
 	// Calculate stats
 	took := time.Since(start)
 	tookNS := took.Nanoseconds()
