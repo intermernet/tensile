@@ -33,7 +33,8 @@ var (
 	maxErrError     string = "ERROR: -maxerror (-e) must be greater than 0, or -1 for unlimited\n"
 	urlError        string = "ERROR: -url (-u) cannot be blank\n"
 	schemeError     string = "ERROR: unsupported protocol scheme %s\n"
-	ErrLimError     string = "ERROR: maximum error limit reached:\t%d\n\n"
+	ErrLimError     string = "ERROR: maximum error limit reached:\t%d\n"
+	ErrTotalError   string = "ERROR: total errors:\t%d\n"
 	cpuWarn         string = "NOTICE: -cpu=%d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
 	maxGTreqsWarn   string = "NOTICE: -concurrent=%d is greater than -requests\n\tChanging -concurrent to %d\n\n"
 
@@ -47,8 +48,8 @@ func init() {
 	flag.IntVar(&reqs, "r", 50, "Total requests (short flag)")
 	flag.IntVar(&max, "concurrent", 5, "Maximum concurrent requests")
 	flag.IntVar(&max, "c", 5, "Maximum concurrent requests (short flag)")
-	flag.IntVar(&maxErr, "maxerror", 1, "Maximum errors before exiting, -1 for unlimited")
-	flag.IntVar(&maxErr, "e", 1, "Maximum errors before exiting, -1 for unlimited (short flag)")
+	flag.IntVar(&maxErr, "maxerror", 1, "Maximum errors before exiting")
+	flag.IntVar(&maxErr, "e", 1, "Maximum errors before exiting (short flag)")
 	flag.StringVar(&urlStr, "url", "http://localhost/", "Target URL")
 	flag.StringVar(&urlStr, "u", "http://localhost/", "Target URL (short flag)")
 }
@@ -120,16 +121,14 @@ func killWorkers(quit chan bool) {
 
 // Check maximum error count
 func checkMaxErr(quit chan bool) bool {
-	if maxErr == -1 {
-		return false
-	}
+	chk := false
 	numErr++
 	if numErr >= maxErr && maxErr != -1 {
 		killWorkers(quit)
 		log.Printf(ErrLimError, numErr)
-		return true
+		chk = true
 	}
-	return false
+	return chk
 }
 
 // Consumer
@@ -146,6 +145,7 @@ func consumer(respChan chan response, quit chan bool) (int64, int64) {
 		case r.err != nil:
 			log.Println(r.err)
 			if checkMaxErr(quit) {
+				log.Printf(ErrTotalError, numErr)
 				return conns, size
 			}
 		case r.StatusCode >= 400:
@@ -154,6 +154,7 @@ func consumer(respChan chan response, quit chan bool) (int64, int64) {
 			}
 			prevStatus = r.StatusCode
 			if checkMaxErr(quit) {
+				log.Printf(ErrTotalError, numErr)
 				return conns, size
 			}
 		default:
@@ -161,6 +162,7 @@ func consumer(respChan chan response, quit chan bool) (int64, int64) {
 			conns++
 		}
 	}
+	log.Printf(ErrTotalError, numErr)
 	return conns, size
 }
 
