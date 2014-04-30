@@ -139,7 +139,6 @@ func consumer(respChan chan response, quit chan bool) (int64, int64) {
 			log.Printf(ErrTotalError, numErr)
 		}
 	}()
-
 	var (
 		conns      int64
 		size       int64
