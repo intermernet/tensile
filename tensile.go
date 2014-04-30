@@ -35,8 +35,10 @@ var (
 	maxError    string = "ERROR: -concurrent must be greater than 0\n"
 	urlError    string = "ERROR: URL cannot be blank\n"
 	schemeError string = "ERROR: unsupported protocol scheme %s\n"
-	cpuError    string = "ERROR: -cpu cannot exceed %d on this system\n"
 	flagErr     string
+
+	cpuWarn       string = "NOTICE: -cpu %d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
+	maxGTreqsWarn string = "NOTICE: -concurrent is greater than -reqs\n\tChanging -concurrent to -reqs\n\n"
 )
 
 func init() {
@@ -126,15 +128,15 @@ func main() {
 	if u.Scheme != "http" && u.Scheme != "https" {
 		flagErr += fmt.Sprintf(schemeError, u.Scheme)
 	}
-	if numCPU > maxCPU {
-		flagErr += fmt.Sprintf(cpuError, maxCPU)
-	}
 	if flagErr != "" {
 		log.Fatal(fmt.Errorf("\n%s", flagErr))
 	}
+	if numCPU > maxCPU {
+		fmt.Printf(cpuWarn, numCPU, maxCPU)
+		numCPU = maxCPU
+	}
 	if max > reqs {
-		fmt.Println("NOTICE: Concurrent requests is greater than number of requests.")
-		fmt.Println("\tChanging concurrent requests to number of requests\n")
+		fmt.Println(maxGTreqsWarn)
 		max = reqs
 	}
 	// Start
