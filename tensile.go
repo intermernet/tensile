@@ -47,8 +47,8 @@ func init() {
 	flag.IntVar(&reqs, "r", 50, "Total requests (short flag)")
 	flag.IntVar(&max, "concurrent", 5, "Maximum concurrent requests")
 	flag.IntVar(&max, "c", 5, "Maximum concurrent requests (short flag)")
-	flag.IntVar(&maxErr, "maxerror", 1, "Maximum errors before exiting")
-	flag.IntVar(&maxErr, "e", 1, "Maximum errors before exiting (short flag)")
+	flag.IntVar(&maxErr, "maxerror", 1, "Maximum errors before exiting, -1 for unlimited")
+	flag.IntVar(&maxErr, "e", 1, "Maximum errors before exiting, -1 for unlimited (short flag)")
 	flag.StringVar(&urlStr, "url", "http://localhost/", "Target URL")
 	flag.StringVar(&urlStr, "u", "http://localhost/", "Target URL (short flag)")
 }
