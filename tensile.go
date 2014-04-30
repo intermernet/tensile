@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
+	"net/url"
 	"runtime"
 	"sync"
 	"time"
@@ -22,16 +22,21 @@ import (
 const version = "0.1"
 
 var (
-	url string
+	urlStr string
 
 	reqs int
 	max  int
 
 	wg sync.WaitGroup
+
+	reqsError   = "ERROR: -reqs must be greater than 0\n"
+	maxError    = "ERROR: -concurrent must be greater than 0\n"
+	urlError    = "ERROR: Invalid URL\n"
+	schemeError = "ERROR: unsupported protocol scheme %s\n"
 )
 
 func init() {
-	flag.StringVar(&url, "url", "http://localhost/", "Target URL")
+	flag.StringVar(&urlStr, "url", "http://localhost/", "Target URL")
 	flag.IntVar(&reqs, "reqs", 50, "Total requests")
 	flag.IntVar(&max, "concurrent", 5, "Maximum concurrent requests")
 }
@@ -45,7 +50,7 @@ type Response struct {
 func dispatcher(reqChan chan *http.Request) {
 	defer close(reqChan)
 	for i := 0; i < reqs; i++ {
-		req, err := http.NewRequest("GET", url, nil)
+		req, err := http.NewRequest("GET", urlStr, nil)
 		if err != nil {
 			log.Println(err)
 		}
@@ -96,33 +101,46 @@ func consumer(respChan chan Response) (int64, int64) {
 }
 
 func main() {
+	// Flag checks
 	flag.Parse()
 	fmt.Printf("\n\tTensile web stress test tool v%s\n\n", version)
 	flagErr := ""
 	if reqs <= 0 {
-		flagErr += "ERROR: -reqs must be greater than 0\n"
+		flagErr += reqsError
 	}
 	if max <= 0 {
-		flagErr += "ERROR: -concurrent must be greater than 0\n"
+		flagErr += maxError
 	}
 	if flagErr != "" {
-		fmt.Printf("%s\n", flagErr)
-		os.Exit(0)
+		log.Fatal(fmt.Errorf("%s", flagErr))
+	}
+	if urlStr == "" {
+		log.Fatal(fmt.Errorf("%s", urlError))
+	}
+	u, err := url.Parse(urlStr)
+	if err != nil {
+		log.Print(urlError)
+		log.Fatal(fmt.Errorf("%s", err))
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		log.Fatal(fmt.Errorf(schemeError, u.Scheme))
 	}
 	if max > reqs {
 		fmt.Println("NOTICE: Concurrent requests is greater than number of requests.")
 		fmt.Println("\tChanging concurrent requests to number of requests\n")
 		max = reqs
 	}
+	// Start
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	reqChan := make(chan *http.Request)
 	respChan := make(chan Response)
-	fmt.Printf("Sending %d requests to %s with %d concurrent workers.\n\n", reqs, url, max)
+	fmt.Printf("Sending %d requests to %s with %d concurrent workers.\n\n", reqs, urlStr, max)
 	start := time.Now()
 	go dispatcher(reqChan)
 	go workerPool(reqChan, respChan)
 	fmt.Println("Waiting for replies...\n")
 	conns, size := consumer(respChan)
+	// Calculate stats
 	took := time.Since(start)
 	ns := took.Nanoseconds()
 	var av int64
