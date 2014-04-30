@@ -27,18 +27,23 @@ var (
 	reqs int
 	max  int
 
-	wg sync.WaitGroup
+	wg     sync.WaitGroup
+	numCPU int
+	maxCPU int
 
 	reqsError   string = "ERROR: -reqs must be greater than 0\n"
 	maxError    string = "ERROR: -concurrent must be greater than 0\n"
 	urlError    string = "ERROR: URL cannot be blank\n"
 	schemeError string = "ERROR: unsupported protocol scheme %s\n"
+	cpuError    string = "ERROR: -cpu cannot exceed %d on this system\n"
 )
 
 func init() {
 	flag.StringVar(&urlStr, "url", "http://localhost/", "Target URL")
 	flag.IntVar(&reqs, "reqs", 50, "Total requests")
 	flag.IntVar(&max, "concurrent", 5, "Maximum concurrent requests")
+	maxCPU = runtime.NumCPU()
+	flag.IntVar(&numCPU, "cpu", maxCPU, "Number of CPUs")
 }
 
 type Response struct {
@@ -120,6 +125,9 @@ func main() {
 	}
 	if u.Scheme != "http" && u.Scheme != "https" {
 		flagErr += fmt.Sprintf(schemeError, u.Scheme)
+	}
+	if numCPU > maxCPU {
+		flagErr += fmt.Sprintf(cpuError, maxCPU)
 	}
 	if flagErr != "" {
 		log.Fatal(fmt.Errorf("\n%s", flagErr))
