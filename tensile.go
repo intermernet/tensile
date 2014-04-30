@@ -66,12 +66,12 @@ func workerPool(reqChan chan *http.Request, respChan chan Response) {
 
 // Worker
 func worker(t *http.Transport, reqChan chan *http.Request, respChan chan Response) {
+	defer wg.Done()
 	for req := range reqChan {
 		resp, err := t.RoundTrip(req)
 		r := Response{resp, err}
 		respChan <- r
 	}
-	wg.Done()
 }
 
 // Consumer
