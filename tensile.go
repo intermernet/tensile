@@ -33,15 +33,13 @@ var (
 	maxErr         int
 	runningWorkers int
 
-	urlStr string
-
-	flagErr     string
-	reqsError   string = "ERROR: -reqs (-r) must be greater than 0\n"
-	maxError    string = "ERROR: -concurrent (-c) must be greater than 0\n"
-	maxErrError string = "ERROR: -maxerror (-e) must be greater than 0\n"
-	urlError    string = "ERROR: -url (-u) cannot be blank\n"
-	schemeError string = "ERROR: unsupported protocol scheme %s\n"
-
+	urlStr        string
+	flagErr       string
+	reqsError     string = "ERROR: -reqs (-r) must be greater than 0\n"
+	maxError      string = "ERROR: -concurrent (-c) must be greater than 0\n"
+	maxErrError   string = "ERROR: -maxerror (-e) must be greater than 0\n"
+	urlError      string = "ERROR: -url (-u) cannot be blank\n"
+	schemeError   string = "ERROR: unsupported protocol scheme %s\n"
 	cpuWarn       string = "NOTICE: -cpu=%d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
 	maxGTreqsWarn string = "NOTICE: -concurrent=%d is greater than -requests\n\tChanging -concurrent to %d\n\n"
 
@@ -114,6 +112,13 @@ func worker(t *http.Transport, reqChan chan *http.Request, respChan chan Respons
 	}
 }
 
+// Kill Workers
+func killWorkers(n int, quit chan bool) {
+	for i := 0; i < n; i++ {
+		quit <- true
+	}
+}
+
 // Consumer
 func consumer(respChan chan Response, quit chan bool) (int64, int64) {
 	defer close(quit)
@@ -128,9 +133,7 @@ func consumer(respChan chan Response, quit chan bool) (int64, int64) {
 			log.Println(r.err)
 			numErr++
 			if numErr >= maxErr {
-				for i := 0; i < runningWorkers; i++ {
-					quit <- true
-				}
+				killWorkers(runningWorkers, quit)
 				log.Printf("Number of Errors:\t%d\n\n", numErr)
 				return conns, size
 			}
@@ -141,9 +144,7 @@ func consumer(respChan chan Response, quit chan bool) (int64, int64) {
 			prevStatus = r.StatusCode
 			numErr++
 			if numErr >= maxErr {
-				for i := 0; i < runningWorkers; i++ {
-					quit <- true
-				}
+				killWorkers(runningWorkers, quit)
 				log.Printf("Number of Errors:\t%d\n\n", numErr)
 				return conns, size
 			}
