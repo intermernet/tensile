@@ -35,7 +35,7 @@ var (
 	flagErr     string
 	reqsError   string = "ERROR: -reqs must be greater than 0\n"
 	maxError    string = "ERROR: -concurrent must be greater than 0\n"
-	urlError    string = "ERROR: URL cannot be blank\n"
+	urlError    string = "ERROR: -url cannot be blank\n"
 	schemeError string = "ERROR: unsupported protocol scheme %s\n"
 
 	cpuWarn       string = "NOTICE: -cpu=%d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
