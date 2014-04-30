@@ -53,7 +53,7 @@ func init() {
 	flag.IntVar(&numCPU, "cpu", maxCPU, "Number of CPUs")
 }
 
-type Response struct {
+type response struct {
 	*http.Response
 	err error
 }
@@ -71,7 +71,7 @@ func dispatcher(reqChan chan *http.Request) {
 }
 
 // Worker Pool
-func workerPool(reqChan chan *http.Request, respChan chan Response, quit chan bool) {
+func workerPool(reqChan chan *http.Request, respChan chan response, quit chan bool) {
 	defer close(respChan)
 	defer wg.Wait()
 	t := &http.Transport{}
@@ -83,14 +83,14 @@ func workerPool(reqChan chan *http.Request, respChan chan Response, quit chan bo
 }
 
 // Worker
-func worker(t *http.Transport, reqChan chan *http.Request, respChan chan Response, quit chan bool) {
+func worker(t *http.Transport, reqChan chan *http.Request, respChan chan response, quit chan bool) {
 	defer wg.Done()
 	for {
 		select {
 		case req, ok := <-reqChan:
 			if ok {
 				resp, err := t.RoundTrip(req)
-				r := Response{resp, err}
+				r := response{resp, err}
 				respChan <- r
 			} else {
 				return
@@ -112,7 +112,7 @@ func killWorkers(quit chan bool) {
 	}
 }
 
-//Check maximum error count
+// Check maximum error count
 func checkMaxErr(quit chan bool) bool {
 	numErr++
 	if numErr >= maxErr {
@@ -123,8 +123,15 @@ func checkMaxErr(quit chan bool) bool {
 	return false
 }
 
+// Close response Body
+func closeResponseBody(r *response) {
+	if err := r.Body.Close(); err != nil {
+		log.Println(r.err)
+	}
+}
+
 // Consumer
-func consumer(respChan chan Response, quit chan bool) (int64, int64) {
+func consumer(respChan chan response, quit chan bool) (int64, int64) {
 	defer close(quit)
 	var (
 		conns      int64
@@ -132,6 +139,7 @@ func consumer(respChan chan Response, quit chan bool) (int64, int64) {
 		prevStatus int
 	)
 	for r := range respChan {
+		defer closeResponseBody(&r)
 		switch {
 		case r.err != nil:
 			log.Println(r.err)
@@ -148,9 +156,6 @@ func consumer(respChan chan Response, quit chan bool) (int64, int64) {
 			}
 		default:
 			size += r.ContentLength
-			if err := r.Body.Close(); err != nil {
-				log.Println(r.err)
-			}
 			conns++
 		}
 	}
@@ -192,7 +197,7 @@ func main() {
 	// Start
 	runtime.GOMAXPROCS(numCPU)
 	reqChan := make(chan *http.Request)
-	respChan := make(chan Response)
+	respChan := make(chan response)
 	quit := make(chan bool, max)
 	fmt.Printf("Sending %d requests to %s with %d concurrent workers using %d CPUs.\n\n", reqs, urlStr, max, numCPU)
 	start := time.Now()
