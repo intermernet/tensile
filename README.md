@@ -13,6 +13,8 @@ Example usage:
     
     
     tensile -concurrent=200 -reqs=1000
+
+            Tensile web stress test tool v0.1
     
     Sending 1000 requests to http://localhost/ with 200 concurrent workers.
     Waiting for replies...
@@ -25,6 +27,9 @@ Example usage:
 
 
     tensile -concurrent=200 -reqs=100
+
+            Tensile web stress test tool v0.1
+            
     NOTICE: Concurrent requests is greater than number of requests.
             Changing concurrent requests to number of requests
     
