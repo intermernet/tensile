@@ -81,9 +81,9 @@ func dispatcher(reqChan chan *http.Request) {
 // Worker Pool
 func workerPool(reqChan chan *http.Request, respChan chan response, quit chan bool) {
 	defer close(respChan)
-	defer wg.Wait()
 	t := &http.Transport{}
 	defer t.CloseIdleConnections()
+	defer wg.Wait()
 	for i := 0; i < max; i++ {
 		wg.Add(1)
 		go worker(t, reqChan, respChan, quit)
