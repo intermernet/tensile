@@ -214,7 +214,7 @@ func main() {
 	reqChan := make(chan *http.Request)
 	respChan := make(chan response)
 	quit := make(chan bool, max)
-	fmt.Printf("Sending %d requests to %s with %d concurrent workers using %d CPUs.\n\n", reqs, urlStr, max, numCPU)
+	fmt.Printf("Target URL:\t%s\nRequests:\t%d\nConcurrent:\t%d\nProcessors:\t%d\n\n", urlStr, reqs, max, numCPU)
 	start := time.Now()
 	go dispatcher(reqChan, quit)
 	go workerPool(reqChan, respChan, quit)
@@ -235,5 +235,5 @@ func main() {
 		log.Println(err)
 	}
 	sizeHuman := ByteSize(float64(size))
-	fmt.Printf("Connections:\t%d\nConcurrent:\t%d\nTotal size:\t%s\nTotal time:\t%s\nAverage time:\t%s\n", conns, max, sizeHuman, took, average)
+	fmt.Printf("Replies:\t%d\nTotal size:\t%s\nTotal time:\t%s\nAverage time:\t%s\n", conns, sizeHuman, took, average)
 }
