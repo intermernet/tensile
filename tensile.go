@@ -67,14 +67,19 @@ func (r *response) closeBody() {
 }
 
 // Dispatcher
-func dispatcher(reqChan chan *http.Request) {
+func dispatcher(reqChan chan *http.Request, quit chan bool) {
 	defer close(reqChan)
 	for i := 0; i < reqs; i++ {
 		req, err := http.NewRequest("GET", urlStr, nil)
 		if err != nil {
 			log.Println(err)
 		}
-		reqChan <- req
+		select {
+		case <-quit:
+			return
+		default:
+			reqChan <- req
+		}
 	}
 }
 
@@ -139,7 +144,6 @@ func consumer(respChan chan response, quit chan bool) (int64, int64) {
 		prevStatus  int
 	)
 	for r := range respChan {
-		defer r.closeBody()
 		switch {
 		case r.err != nil:
 			log.Println(r.err)
@@ -158,13 +162,13 @@ func consumer(respChan chan response, quit chan bool) (int64, int64) {
 			size += r.ContentLength
 			conns++
 		}
+		r.closeBody()
 	}
 	return conns, size
 }
 
-func main() {
+func checkFlags() {
 	flag.Parse()
-	fmt.Printf(app, version)
 	// Flag Errors
 	if reqs <= 0 {
 		flagErr += reqsError
@@ -197,14 +201,18 @@ func main() {
 		fmt.Printf(maxGTreqsWarn, max, reqs)
 		max = reqs
 	}
-	// Start
+}
+
+func main() {
+	checkFlags()
+	fmt.Printf(app, version)
 	runtime.GOMAXPROCS(numCPU)
 	reqChan := make(chan *http.Request)
 	respChan := make(chan response)
 	quit := make(chan bool, max)
 	fmt.Printf("Sending %d requests to %s with %d concurrent workers using %d CPUs.\n\n", reqs, urlStr, max, numCPU)
 	start := time.Now()
-	go dispatcher(reqChan)
+	go dispatcher(reqChan, quit)
 	go workerPool(reqChan, respChan, quit)
 	fmt.Println("Waiting for replies...\n")
 	conns, size := consumer(respChan, quit)
