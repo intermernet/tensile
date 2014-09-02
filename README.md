@@ -28,7 +28,7 @@ Example usage:
     
     Connections:    1000
     Concurrent:     200
-    Total size:     15000 bytes
+    Total size:     14.65KB
     Total time:     1.9903687s
     Average time:   1.990368ms
 
@@ -46,7 +46,7 @@ Example usage:
     
     Connections:    100
     Concurrent:     100
-    Total size:     1500 bytes
+    Total size:     1.46KB
     Total time:     197.1718ms
     Average time:   1.971718ms
 
