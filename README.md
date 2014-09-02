@@ -23,11 +23,14 @@ Example usage:
 
             Tensile web stress test tool v0.1
     
-    Sending 1000 requests to http://localhost/ with 200 concurrent workers using 2 CPUs.
+    Target URL:     http://localhost/
+    Requests:       1000
+    Concurrent:     200
+    Processors:     2
+
     Waiting for replies...
     
-    Connections:    1000
-    Concurrent:     200
+    Replies:        1000
     Total size:     14.65KB
     Total time:     1.9903687s
     Average time:   1.990368ms
@@ -41,11 +44,17 @@ Example usage:
     NOTICE: -concurrent=200 is greater than -reqs
             Changing -concurrent to 100
     
-    Sending 100 requests to http://localhost/ with 100 concurrent workers using 4 CPUs.
+
+            Tensile web stress test tool v0.1
+    
+    Target URL:     http://localhost/
+    Requests:       100
+    Concurrent:     100
+    Processors:     4
+
     Waiting for replies...
     
-    Connections:    100
-    Concurrent:     100
+    Replies:        100
     Total size:     1.46KB
     Total time:     197.1718ms
     Average time:   1.971718ms
