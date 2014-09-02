@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	app     = "\n\tTensile web stress test tool v%s\n\n"
+	app     = "Tensile web stress test tool v"
 	version = "0.1"
 )
 
@@ -78,6 +78,7 @@ func dispatcher(reqChan chan *http.Request, quit chan bool) {
 		case <-quit:
 			return
 		default:
+			req.Header.Add("User-Agent", app+version)
 			reqChan <- req
 		}
 	}
@@ -159,7 +160,10 @@ func consumer(respChan chan response, quit chan bool) (int64, int64) {
 				return conns, size
 			}
 		default:
-			size += r.ContentLength
+			rSize := r.ContentLength
+			if rSize >= 0 {
+				size += rSize
+			}
 			conns++
 		}
 		r.closeBody()
@@ -205,7 +209,7 @@ func checkFlags() {
 
 func main() {
 	checkFlags()
-	fmt.Printf(app, version)
+	fmt.Printf("\n\t%s\n\n", app+version)
 	runtime.GOMAXPROCS(numCPU)
 	reqChan := make(chan *http.Request)
 	respChan := make(chan response)
