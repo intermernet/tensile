@@ -66,6 +66,12 @@ func (r *response) closeBody() {
 	}
 }
 
+// Read response details
+func (r *response) read() (int, string, int64, error) {
+	return r.StatusCode, r.Status, r.ContentLength, r.err
+	r.closeBody()
+}
+
 // Dispatcher
 func dispatcher(reqChan chan *http.Request, quit chan bool) {
 	defer close(reqChan)
@@ -145,32 +151,32 @@ func consumer(respChan chan response, quit chan bool) (int64, int64) {
 		prevStatus  int
 	)
 	for r := range respChan {
+		code, status, rSize, err := r.read()
 		switch {
-		case r.err != nil:
-			log.Println(r.err)
+		case err != nil:
+			log.Println(err)
 			if checkMaxErr(quit) {
 				return conns, size
 			}
-		case r.StatusCode >= 400:
-			if r.StatusCode != prevStatus {
-				log.Printf("ERROR: %s\n", r.Status)
+		case code >= 400:
+			if code != prevStatus {
+				log.Printf("ERROR: %s\n", status)
 			}
-			prevStatus = r.StatusCode
+			prevStatus = code
 			if checkMaxErr(quit) {
 				return conns, size
 			}
 		default:
-			rSize := r.ContentLength
 			if rSize >= 0 {
 				size += rSize
 			}
 			conns++
 		}
-		r.closeBody()
 	}
 	return conns, size
 }
 
+// Check flags for errors and warnings
 func checkFlags() {
 	flag.Parse()
 	// Flag Errors
