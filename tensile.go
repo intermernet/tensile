@@ -43,7 +43,7 @@ var (
 
 func init() {
 	maxCPU = runtime.NumCPU()
-	flag.IntVar(&numCPU, "cpu", maxCPU, "Number of CPUs")
+	flag.IntVar(&numCPU, "cpu", 1, "Number of CPUs")
 	flag.IntVar(&reqs, "requests", 50, "Total requests")
 	flag.IntVar(&reqs, "r", 50, "Total requests (short flag)")
 	flag.IntVar(&max, "concurrent", 5, "Maximum concurrent requests")
@@ -218,7 +218,7 @@ func main() {
 	start := time.Now()
 	go dispatcher(reqChan, quit)
 	go workerPool(reqChan, respChan, quit)
-	fmt.Println("Waiting for replies...\n")
+	fmt.Printf("Waiting for replies...\n\n")
 	conns, size := consumer(respChan, quit)
 	if numErr > 0 {
 		log.Printf(ErrTotalError, numErr)
