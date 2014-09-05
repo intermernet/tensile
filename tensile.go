@@ -33,9 +33,10 @@ var (
 	maxErrError     string = "ERROR: -maxerror (-e) must be greater than 0, or -1 for unlimited\n"
 	urlError        string = "ERROR: -url (-u) cannot be blank\n"
 	schemeError     string = "ERROR: unsupported protocol scheme %s\n"
-	ErrLimError     string = "ERROR: maximum error limit reached:\t%d\n"
-	ErrTotalError   string = "ERROR: total errors:\t%d\n"
+	ErrLimError     string = "ERROR: maximum error limit reached: %d\n"
+	ErrTotalError   string = "ERROR: total errors: %d\n"
 	cpuWarn         string = "NOTICE: -cpu=%d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
+	cpuLTE0Warn     string = "NOTICE: -cpu=%d is less than 1\n\tChanging -cpu to 1\n\n"
 	maxGTreqsWarn   string = "NOTICE: -concurrent=%d is greater than -requests\n\tChanging -concurrent to %d\n\n"
 
 	wg sync.WaitGroup
@@ -200,6 +201,10 @@ func checkFlags() {
 	if numCPU > maxCPU {
 		fmt.Printf(cpuWarn, numCPU, maxCPU)
 		numCPU = maxCPU
+	}
+	if numCPU < 1 {
+		fmt.Printf(cpuLTE0Warn, numCPU)
+		numCPU = 1
 	}
 	if max > reqs {
 		fmt.Printf(maxGTreqsWarn, max, reqs)
