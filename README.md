@@ -1,3 +1,5 @@
+[![Build Status](https://drone.io/github.com/Intermernet/tensile/status.png)](https://drone.io/github.com/Intermernet/tensile/latest)
+
 tensile
 =======
 
@@ -60,3 +62,7 @@ Example usage:
     Average time:   1.971718ms
 
 *WARNING: This tool can rapidly deplete system resources with too many concurrent workers*
+
+LICENSE: BSD 3 Clause
+
+Copyright: Mike Hughes 2014
