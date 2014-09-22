@@ -5,6 +5,9 @@ Mike Hughes 2014
 intermernet AT gmail DOT com
 
 LICENSE BSD 3 Clause
+
+ ByteSize function (and bytesize.go) taken from http://golang.org/doc/progs/eff_bytesize.go
+ Copyright the Go Authors.
 */
 package main
 
@@ -240,5 +243,5 @@ func main() {
 		log.Println(err)
 	}
 	sizeHuman := ByteSize(float64(size))
-	fmt.Printf("Replies:\t%d\nTotal size:\t%s\nTotal time:\t%s\nAverage time:\t%s\n", conns, sizeHuman, took, average)
+	fmt.Printf("Replies:\t%d\nTotal size:\t%s\nTotal time:\t%s\nAverage time:\t%s\n\n", conns, sizeHuman, took, average)
 }
