@@ -7,8 +7,8 @@ import "fmt"
 type byteSize float64
 
 const (
+	_ = iota // ignore first value by assigning to blank identifier
 	// Define size suffixes
-	_           = iota // ignore first value by assigning to blank identifier
 	KB byteSize = 1 << (10 * iota)
 	MB
 	GB
