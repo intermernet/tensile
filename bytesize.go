@@ -4,11 +4,12 @@ package main
 
 import "fmt"
 
-type ByteSize float64
+type byteSize float64
 
 const (
+	// Define size suffixes
 	_           = iota // ignore first value by assigning to blank identifier
-	KB ByteSize = 1 << (10 * iota)
+	KB byteSize = 1 << (10 * iota)
 	MB
 	GB
 	TB
@@ -18,7 +19,7 @@ const (
 	YB
 )
 
-func (b ByteSize) String() string {
+func (b byteSize) String() string {
 	switch {
 	case b >= YB:
 		return fmt.Sprintf("%.2fYB", b/YB)

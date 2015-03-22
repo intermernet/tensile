@@ -31,16 +31,16 @@ var (
 	reqs, max, numCPU, maxCPU, numErr, maxErr int
 
 	urlStr, flagErr string
-	reqsError       string = "ERROR: -requests (-r) must be greater than 0\n"
-	maxError        string = "ERROR: -concurrent (-c) must be greater than 0\n"
-	maxErrError     string = "ERROR: -maxerror (-e) must be greater than 0, or -1 for unlimited\n"
-	urlError        string = "ERROR: -url (-u) cannot be blank\n"
-	schemeError     string = "ERROR: unsupported protocol scheme %s\n"
-	ErrLimError     string = "ERROR: maximum error limit reached: %d\n"
-	ErrTotalError   string = "ERROR: total errors: %d\n"
-	cpuWarn         string = "NOTICE: -cpu=%d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
-	cpuLTE0Warn     string = "NOTICE: -cpu=%d is less than 1\n\tChanging -cpu to 1\n\n"
-	maxGTreqsWarn   string = "NOTICE: -concurrent=%d is greater than -requests\n\tChanging -concurrent to %d\n\n"
+	reqsError       = "ERROR: -requests (-r) must be greater than 0\n"
+	maxError        = "ERROR: -concurrent (-c) must be greater than 0\n"
+	maxErrError     = "ERROR: -maxerror (-e) must be greater than 0, or -1 for unlimited\n"
+	urlError        = "ERROR: -url (-u) cannot be blank\n"
+	schemeError     = "ERROR: unsupported protocol scheme %s\n"
+	errLimError     = "ERROR: maximum error limit reached: %d\n"
+	errTotalError   = "ERROR: total errors: %d\n"
+	cpuWarn         = "NOTICE: -cpu=%d is greater than the number of CPUs on this system\n\tChanging -cpu to %d\n\n"
+	cpuLTE0Warn     = "NOTICE: -cpu=%d is less than 1\n\tChanging -cpu to 1\n\n"
+	maxGTreqsWarn   = "NOTICE: -concurrent=%d is greater than -requests\n\tChanging -concurrent to %d\n\n"
 
 	wg sync.WaitGroup
 )
@@ -135,7 +135,7 @@ func checkMaxErr(quit chan bool) bool {
 	numErr++
 	if numErr >= maxErr && maxErr != -1 {
 		killWorkers(quit)
-		log.Printf(ErrLimError, numErr)
+		log.Printf(errLimError, numErr)
 		chk = true
 	}
 	return chk
@@ -229,7 +229,7 @@ func main() {
 	fmt.Printf("Waiting for replies...\n\n")
 	conns, size := consumer(respChan, quit)
 	if numErr > 0 {
-		log.Printf(ErrTotalError, numErr)
+		log.Printf(errTotalError, numErr)
 	}
 	// Calculate stats
 	took := time.Since(start)
@@ -242,6 +242,6 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
-	sizeHuman := ByteSize(float64(size))
+	sizeHuman := byteSize(float64(size))
 	fmt.Printf("Replies:\t%d\nTotal size:\t%s\nTotal time:\t%s\nAverage time:\t%s\n\n", conns, sizeHuman, took, average)
 }
